@@ -1,0 +1,49 @@
+type Query {
+  # Search for cities based on a search term (e.g. "Cape Town")
+  searchCities(input: String!): [City!]!
+
+  # Get weather information for a specific city by its ID (combination of latitude and longitude)
+  getCityWeather(cityId: String!): CityWeather!
+}
+
+#Represents a city, including its name, geographic coordinates, and country information.
+type City {
+  id: String! #Unique identifier for the city (combination of latitude and longitude, city and country) e.g. "-33.92584,18.42322:Cape Town:South Africa"
+  name: String!
+  country: String!
+  latitude: Float!
+  longitude: Float!
+}
+
+#Describes current weather conditions for a city at a specific time.
+type Weather {
+  temperature: Float!
+  conditions: String!
+  humidity: Float!
+  windSpeed: Float!
+  precipitation: Float!
+  forecast: [DailyForecast!]!
+}
+#Forecast information for a single day within the weather data set.
+type DailyForecast {
+  date: String!
+  maxTemp: Float!
+  minTemp: Float!
+  conditions: String!
+  precipitation: Float!
+  windSpeed: Float!
+  activities: [Activity!]!
+}
+
+#An activity suggestion with an associated suitability score and explanatory reasoning.
+type Activity {
+  name: String!
+  suitabilityScore: Int!
+  reasoning: String!
+}
+
+#Aggregates a City with its corresponding Weather information.
+type CityWeather {
+  city: City!
+  weather: Weather!
+}
