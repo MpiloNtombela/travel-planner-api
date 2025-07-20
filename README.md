@@ -152,7 +152,7 @@ const ACTIVITY_CONFIGS = [
 - **Single source of truth** for API contracts
 
 ### Testing Strategy
-<img width="1058" height="420" alt="image" src="https://github.com/user-attachments/assets/903e78e6-180f-4184-8887-6d189f814d7e" />
+<img width="944" height="418" alt="image" src="https://github.com/user-attachments/assets/5cc51914-0c34-47da-9ec9-46c23bac6ddb" />
 
 
 ## Omissions & Trade-offs
