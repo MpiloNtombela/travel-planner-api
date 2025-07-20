@@ -15,8 +15,6 @@ export const resolvers: Resolvers = {
         console.log(`Found ${cities.length} cities for query: "${input}"`);
         return cities;
       } catch (error) {
-        console.error('Error searching cities:', error);
-
         if (error instanceof OpenMeteoAPIError) {
           throw new GraphQLError(error.message, {
             extensions: {
@@ -52,8 +50,6 @@ export const resolvers: Resolvers = {
           weather,
         };
       } catch (error) {
-        console.error('Error getting city weather:', error);
-
         if (error instanceof GraphQLError) {
           throw error;
         }
