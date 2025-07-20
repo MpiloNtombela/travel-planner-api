@@ -86,6 +86,7 @@ src/
 ├── __tests__/
 │   └── activityRanking.tests.ts
 │   └── openMeteoAPI.tests.ts
+│   └── resolvers.integration.tests.ts
 └── schema.graphql
 ```
 
@@ -151,12 +152,8 @@ const ACTIVITY_CONFIGS = [
 - **Single source of truth** for API contracts
 
 ### Testing Strategy
+<img width="1058" height="420" alt="image" src="https://github.com/user-attachments/assets/903e78e6-180f-4184-8887-6d189f814d7e" />
 
-| Component | Coverage | Test Type | Description |
-|-----------|----------|-----------|-------------|
-| **Activity Ranking** | 100% | Unit Tests | Core business logic with edge cases |
-| **OpenMeteo Service** | 90% | Unit Tests | External API integration with error scenarios |
-| **GraphQL Resolvers** | 88% | Integration Tests | Full API flow testing with mocked external APIs |
 
 ## Omissions & Trade-offs
 
@@ -216,4 +213,4 @@ npm run generate    # Generate types from GraphQL schema
 
 ---
 
-**Made with ❤️ by Mpilo Ntombela**
+**Made with ❤️ by [Mpilo Ntombela](https://github.com/MpiloNtombela/)**
