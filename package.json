@@ -11,14 +11,19 @@
     "build": "npm run generate && tsc",
     "start": "npm run build && node dist/index.js",
     "dev": "npm run generate && nodemon --watch src --ext ts --exec \"tsc && node dist/index.js\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.7",
     "@graphql-codegen/typescript": "^4.1.6",
     "@graphql-codegen/typescript-resolvers": "^4.5.1",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.0.15",
+    "jest": "^30.0.4",
     "nodemon": "^3.1.10",
+    "ts-jest": "^29.4.0",
     "typescript": "^5.8.3"
   },
   "dependencies": {
