@@ -63,7 +63,7 @@ export class ActivityRankingService {
    * @param top - The number of activities to return (default is 1)
    * @returns The ranked activities
    */
-  public rankActivitiesForDay(forecast: Omit<DailyForecast, 'activities'>, top: number = 1): Activity[] {
+  rankActivitiesForDay(forecast: Omit<DailyForecast, 'activities'>, top: number = 1): Activity[] {
     const avgTemp = (forecast.maxTemp + forecast.minTemp) / 2;
     const hasRain = forecast.precipitation > 1;
     const isWindy = forecast.windSpeed > 20;
