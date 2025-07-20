@@ -1,55 +1,37 @@
 import type { Activity, DailyForecast } from '../__generated__/resolvers-types.js';
+import { ACTIVITY_CONFIGS, type ActivityConfig } from './constants.js';
 
 /**
- * Activity configuration type
- * @param name - The name of the activity
- * @param idealTempMin - The minimum ideal temperature for the activity
- * @param idealTempMax - The maximum ideal temperature for the activity
- * @param rainTolerance - The tolerance for rain (0 = hates rain, 1 = loves rain)
- * @param windPreference - The preference for wind (0 = hates wind, 1 = loves wind)
+ * ActivityRankingService class for ranking activities based on weather conditions
  */
-type ActivityConfig = {
-  name: string;
-  idealTempMin: number;
-  idealTempMax: number;
-  rainTolerance: number;
-  windPreference: number;
-};
-
-const ACTIVITY_CONFIGS: ActivityConfig[] = [
-  {
-    name: 'skiing',
-    idealTempMin: -10,
-    idealTempMax: 2,
-    rainTolerance: 0.1,
-    windPreference: 0.2,
-  },
-  {
-    name: 'surfing',
-    idealTempMin: 18,
-    idealTempMax: 28,
-    rainTolerance: 0.7,
-    windPreference: 0.8,
-  },
-  {
-    name: 'indoor_sightseeing',
-    idealTempMin: 10,
-    idealTempMax: 30,
-    rainTolerance: 1.0,
-    windPreference: 0.5,
-  },
-  {
-    name: 'outdoor_sightseeing',
-    idealTempMin: 15,
-    idealTempMax: 25,
-    rainTolerance: 0.1,
-    windPreference: 0.3,
-  },
-];
-
 export class ActivityRankingService {
   private static instance: ActivityRankingService;
+  private readonly BASE_SCORE = 50;
+  private readonly IDEAL_TEMP_BONUS = 30;
+  private readonly COLD_PENALTY_MULTIPLIER = 5;
+  private readonly WARM_PENALTY_MULTIPLIER = 5;
+  private readonly MAX_TEMP_PENALTY = 30;
+  private readonly RAIN_IMPACT_MULTIPLIER = 20;
+  private readonly HIGH_TOLERANCE_BONUS = 10;
+  private readonly LOW_TOLERANCE_BONUS = 10;
+  private readonly HIGH_TOLERANCE_THRESHOLD = 0.8;
+  private readonly LOW_TOLERANCE_THRESHOLD = 0.3;
+  private readonly WIND_IMPACT_MULTIPLIER = 15;
+  private readonly WIND_OFFSET = 7.5;
+  private readonly HIGH_PREFERENCE_THRESHOLD = 0.6;
+  private readonly LOW_PREFERENCE_THRESHOLD = 0.4;
+  private readonly EXTREME_WEATHER_BONUS = 15;
+  private readonly COLD_THRESHOLD = 10;
+  private readonly HOT_THRESHOLD = 30;
+  private readonly RAIN_THRESHOLD = 1;
+  private readonly WIND_THRESHOLD = 20;
+  private readonly MIN_SCORE = 0;
+  private readonly MAX_SCORE = 100;
 
+  /**
+   * Get the singleton instance of the ActivityRankingService class
+   * @returns The singleton instance of the ActivityRankingService class
+   */
   public static getInstance(): ActivityRankingService {
     if (!ActivityRankingService.instance) {
       ActivityRankingService.instance = new ActivityRankingService();
@@ -65,8 +47,8 @@ export class ActivityRankingService {
    */
   rankActivitiesForDay(forecast: Omit<DailyForecast, 'activities'>, top: number = 1): Activity[] {
     const avgTemp = (forecast.maxTemp + forecast.minTemp) / 2;
-    const hasRain = forecast.precipitation > 1;
-    const isWindy = forecast.windSpeed > 20;
+    const hasRain = forecast.precipitation > this.RAIN_THRESHOLD;
+    const isWindy = forecast.windSpeed > this.WIND_THRESHOLD;
 
     const activities: Activity[] = ACTIVITY_CONFIGS.map((config) => this.scoreActivity(config, avgTemp, hasRain, isWindy, forecast.precipitation, forecast.windSpeed));
 
@@ -84,58 +66,58 @@ export class ActivityRankingService {
    * @returns The activity score
    */
   private scoreActivity(config: ActivityConfig, avgTemp: number, hasRain: boolean, isWindy: boolean, precipitation: number, windSpeed: number): Activity {
-    let score = 50;
+    let score = this.BASE_SCORE;
     const reasons: string[] = [];
 
     if (avgTemp >= config.idealTempMin && avgTemp <= config.idealTempMax) {
-      score += 30;
+      score += this.IDEAL_TEMP_BONUS;
       reasons.push('ideal temperature');
     } else if (avgTemp < config.idealTempMin) {
-      const penalty = Math.min(30, (config.idealTempMin - avgTemp) * 5);
+      const penalty = Math.min(this.MAX_TEMP_PENALTY, (config.idealTempMin - avgTemp) * this.COLD_PENALTY_MULTIPLIER);
       score -= penalty;
       reasons.push('too cold');
     } else {
-      const penalty = Math.min(30, (avgTemp - config.idealTempMax) * 5);
+      const penalty = Math.min(this.MAX_TEMP_PENALTY, (avgTemp - config.idealTempMax) * this.WARM_PENALTY_MULTIPLIER);
       score -= penalty;
       reasons.push('too warm');
     }
 
     if (hasRain) {
-      const rainImpact = (1 - config.rainTolerance) * 20;
+      const rainImpact = (1 - config.rainTolerance) * this.RAIN_IMPACT_MULTIPLIER;
       score -= rainImpact;
-      if (config.rainTolerance > 0.8) {
-        score += 10;
+      if (config.rainTolerance > this.HIGH_TOLERANCE_THRESHOLD) {
+        score += this.HIGH_TOLERANCE_BONUS;
         reasons.push('rain makes it more appealing');
-      } else if (config.rainTolerance < 0.3) {
+      } else if (config.rainTolerance < this.LOW_TOLERANCE_THRESHOLD) {
         reasons.push('rain not ideal');
       }
     } else {
-      if (config.rainTolerance < 0.3) {
-        score += 10;
+      if (config.rainTolerance < this.LOW_TOLERANCE_THRESHOLD) {
+        score += this.LOW_TOLERANCE_BONUS;
         reasons.push('no rain');
       }
     }
 
     if (isWindy) {
-      const windImpact = config.windPreference * 15 - 7.5;
+      const windImpact = config.windPreference * this.WIND_IMPACT_MULTIPLIER - this.WIND_OFFSET;
       score += windImpact;
-      if (config.windPreference > 0.6) {
+      if (config.windPreference > this.HIGH_PREFERENCE_THRESHOLD) {
         reasons.push('good wind conditions');
-      } else if (config.windPreference < 0.4) {
+      } else if (config.windPreference < this.LOW_PREFERENCE_THRESHOLD) {
         reasons.push('windy conditions');
       }
     }
 
     if (config.name.includes('indoor')) {
-      if (avgTemp < 10 || avgTemp > 30) {
-        score += 15;
+      if (avgTemp < this.COLD_THRESHOLD || avgTemp > this.HOT_THRESHOLD) {
+        score += this.EXTREME_WEATHER_BONUS;
         reasons.push('extreme weather favors indoor activities');
       }
     }
 
     return {
       name: config.name,
-      suitabilityScore: Math.max(0, Math.min(100, Math.round(score))),
+      suitabilityScore: Math.max(this.MIN_SCORE, Math.min(this.MAX_SCORE, Math.round(score))),
       reasoning: reasons.join(', ') || 'standard conditions',
     };
   }
