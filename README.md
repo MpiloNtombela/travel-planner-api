@@ -213,4 +213,4 @@ npm run generate    # Generate types from GraphQL schema
 
 ---
 
-**Made with ❤️ by Mpilo Ntombela**
+**Made with ❤️ by [Mpilo Ntombela](https://github.com/MpiloNtombela/)**
