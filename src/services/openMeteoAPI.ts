@@ -126,6 +126,8 @@ export class OpenMeteoAPI {
   private readonly WEATHER_BASE_URL = 'https://api.open-meteo.com/v1';
   private readonly REQUEST_TIMEOUT_MS = 10000;
   private readonly MAX_RESULTS = 10;
+  private readonly MIN_QUERY_LENGTH = 2;
+  private readonly FEATURE_CODES_FOR_CITIES = ['PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PPLC', 'PPL', 'PPLF', 'PPLG', 'PPLL', 'PPLR', 'PPLS', 'PPLW'];
 
   /**
    * Get the singleton instance of the OpenMeteoAPI class
@@ -144,7 +146,7 @@ export class OpenMeteoAPI {
    * @returns The cities that match the query (e.g. "Cape Town")
    */
   async searchCities(query: string): Promise<City[]> {
-    if (!query || query.trim().length < 2) {
+    if (!query || query.trim().length < this.MIN_QUERY_LENGTH) {
       throw new OpenMeteoAPIError('Query must be at least 2 characters long', ERROR_CODES.USER_ERROR.BAD_USER_INPUT);
     }
 
@@ -165,18 +167,7 @@ export class OpenMeteoAPI {
 
       const filteredResults = response.data.results.filter(
         (result) =>
-          result.feature_code === 'PPLA' ||
-          result.feature_code === 'PPLA2' ||
-          result.feature_code === 'PPLA3' ||
-          result.feature_code === 'PPLA4' ||
-          result.feature_code === 'PPLC' ||
-          result.feature_code === 'PPL' ||
-          result.feature_code === 'PPLF' ||
-          result.feature_code === 'PPLG' ||
-          result.feature_code === 'PPLL' ||
-          result.feature_code === 'PPLR' ||
-          result.feature_code === 'PPLS' ||
-          result.feature_code === 'PPLW'
+          this.FEATURE_CODES_FOR_CITIES.includes(result.feature_code)
       );
 
       return filteredResults.map(
