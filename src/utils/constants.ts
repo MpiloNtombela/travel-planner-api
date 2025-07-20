@@ -1,5 +1,3 @@
-// src/utils/constants.ts
-
 /**
  * Weather code mappings for human-readable conditions
  */
@@ -33,6 +31,53 @@ export const WEATHER_CODES: Record<number, string> = {
   96: 'Thunderstorm with slight hail',
   99: 'Thunderstorm with heavy hail',
 } as const;
+
+/**
+ * Activity configuration type
+ * @param name - The name of the activity
+ * @param idealTempMin - The minimum ideal temperature for the activity
+ * @param idealTempMax - The maximum ideal temperature for the activity
+ * @param rainTolerance - The tolerance for rain (0 = hates rain, 1 = loves rain)
+ * @param windPreference - The preference for wind (0 = hates wind, 1 = loves wind)
+ */
+export type ActivityConfig = {
+  name: string;
+  idealTempMin: number;
+  idealTempMax: number;
+  rainTolerance: number;
+  windPreference: number;
+};
+
+export const ACTIVITY_CONFIGS: ActivityConfig[] = [
+  {
+    name: 'skiing',
+    idealTempMin: -10,
+    idealTempMax: 2,
+    rainTolerance: 0.1,
+    windPreference: 0.2,
+  },
+  {
+    name: 'surfing',
+    idealTempMin: 18,
+    idealTempMax: 28,
+    rainTolerance: 0.7,
+    windPreference: 0.8,
+  },
+  {
+    name: 'indoor_sightseeing',
+    idealTempMin: 10,
+    idealTempMax: 30,
+    rainTolerance: 1.0,
+    windPreference: 0.5,
+  },
+  {
+    name: 'outdoor_sightseeing',
+    idealTempMin: 15,
+    idealTempMax: 25,
+    rainTolerance: 0.1,
+    windPreference: 0.3,
+  },
+];
 
 /**
  * Error codes for the application
